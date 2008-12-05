@@ -2,10 +2,35 @@ require 'flyingsaucer'
 require 'java'
 
 class PDFFilter
+  class UserAgent < org.xhtmlrenderer.pdf.ITextUserAgent
+    def initialize(output_device)
+      super
+    end
+
+    def resolveURI(uri)
+      if uri =~ /^\//
+        super(uri[1..uri.length])
+      else
+        super(uri)
+      end
+    end
+    alias :resolve_uri :resolveURI
+  end
+
   class <<self
+    def debug=(b)
+      @debug = b
+    end
+    
+    def debug?
+      @debug
+    end
+
     def filter(controller)
       format = controller.request.parameters[:format]
       return unless format && format.to_sym == :pdf
+
+      controller.logger.debug("Rendering XHTML to PDF:\n" + controller.response.body) if debug?
 
       dom = create_java_dom(controller.response.body) 
       estimated_pdf_length = controller.response.body.length
@@ -13,7 +38,8 @@ class PDFFilter
 
       begin
         renderer = org.xhtmlrenderer.pdf.ITextRenderer.new
-        renderer.set_document(dom, path_to_url(File.join(RAILS_ROOT, 'public', 'placeholder.html')))
+        renderer.shared_context.user_agent_callback = UserAgent.new(renderer.output_device) 
+        renderer.set_document(dom, resource_path)
         renderer.layout
 
         renderer.create_pdf(output)
@@ -39,6 +65,10 @@ class PDFFilter
 
     def path_to_url(path)
       java.io.File.new(path).to_uri.to_url.to_string
+    end
+
+    def resource_path
+      path_to_url(File.join(RAILS_ROOT, 'public', 'placeholder.html'))
     end
   end
 end

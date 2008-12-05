@@ -9,9 +9,19 @@ require 'pdffilter'
 
 RAILS_ROOT = File.dirname(__FILE__)
 
+class LoggerStub
+  def debug(message)
+    @debug_message = message
+  end
+
+  def last_debug_message
+    @debug_message
+  end
+end
+
 class PDFFilterTest < Test::Unit::TestCase
   def setup
-    @controller = Struct.new(:request, :response).new
+    @controller = Struct.new(:request, :response, :logger).new
   end
 
   context "An HTML request" do
@@ -33,6 +43,7 @@ class PDFFilterTest < Test::Unit::TestCase
       @controller.request = stub(:parameters => { :format => "pdf" })
       response_mock = mock()
       @controller.response = response_mock
+      @controller.logger = LoggerStub.new
       response_mock.expects(:body).returns("<html><body><h1>Hello from Flying Saucer!</h1></body></html>").at_least_once
       response_mock.expects(:content_type=).with('application/pdf').once
       @headers = {}
@@ -58,7 +69,35 @@ class PDFFilterTest < Test::Unit::TestCase
       @headers['Pragma'] = 'private'
       PDFFilter.filter(@controller)
       assert_equal 'private', @headers["Pragma"]
-     end
+    end
+
+    should "not log debug message if debug turned off" do
+      PDFFilter.filter(@controller)
+      assert_nil @controller.logger.last_debug_message
+    end
+
+    should "log XHTML content if debug turned on" do
+      old_debug = PDFFilter.debug?
+      PDFFilter.debug = true
+      begin
+        PDFFilter.filter(@controller)
+        assert_match /<html>/, @controller.logger.last_debug_message
+      ensure
+        PDFFilter.debug = old_debug
+      end
+    end
+  end
+
+  context PDFFilter::UserAgent do
+    setup { @user_agent = PDFFilter::UserAgent.new(org.xhtmlrenderer.pdf.ITextOutputDevice.new(1)) }
+
+    should "treat absolute URIs as relative (Java method name)" do
+      assert_equal @user_agent.resolveURI('stylesheets/aim.css'), @user_agent.resolveURI('/stylesheets/aim.css')
+    end
+
+    should "treat absolute URIs as relative (Ruby method name)" do
+      assert_equal @user_agent.resolve_uri('stylesheets/aim.css'), @user_agent.resolve_uri('/stylesheets/aim.css')
+    end
   end
 
 end

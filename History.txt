@@ -1,3 +1,8 @@
+=== 0.2.20081112 / 2008-12-05
+
+* Add debug setting to log the XHTML Flying Saucer sees
+* Treat absolute URIs as relative for better Rails compatibility 
+
 === 0.1.20081112 / 2008-12-03
 
 * Initial version
