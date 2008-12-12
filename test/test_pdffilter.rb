@@ -38,17 +38,31 @@ class PDFFilterTest < Test::Unit::TestCase
     end
   end
 
+  context "A PDF request with an image" do
+    setup do
+      standard_pdf("<html><body><h1><img src='images/apple.jpg' />Hello from Flying Saucer!</h1></body></html>")
+    end
+
+    should "render something" do
+      assert_not_nil PDFFilter.filter(@controller)
+    end
+  end
+
+  def standard_pdf(content)
+    @controller.request = stub(:parameters => { :format => "pdf" })
+    response_mock = mock()
+    @controller.response = response_mock
+    @controller.logger = LoggerStub.new
+    response_mock.expects(:body).returns(content).at_least_once
+    response_mock.expects(:content_type=).with('application/pdf').once
+    @headers = {}
+    response_mock.expects(:headers).returns(@headers).once
+    response_mock.expects(:body=).once
+  end
+
   context "A PDF request" do
     setup do
-      @controller.request = stub(:parameters => { :format => "pdf" })
-      response_mock = mock()
-      @controller.response = response_mock
-      @controller.logger = LoggerStub.new
-      response_mock.expects(:body).returns("<html><body><h1>Hello from Flying Saucer!</h1></body></html>").at_least_once
-      response_mock.expects(:content_type=).with('application/pdf').once
-      @headers = {}
-      response_mock.expects(:headers).returns(@headers).once
-      response_mock.expects(:body=).once
+      standard_pdf("<html><body><h1>Hello from Flying Saucer!</h1></body></html>")
     end
 
     should "render something" do

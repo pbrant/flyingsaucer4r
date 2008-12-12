@@ -38,7 +38,9 @@ class PDFFilter
 
       begin
         renderer = org.xhtmlrenderer.pdf.ITextRenderer.new
-        renderer.shared_context.user_agent_callback = UserAgent.new(renderer.output_device) 
+        agent = UserAgent.new(renderer.output_device)
+        agent.shared_context = renderer.shared_context
+        renderer.shared_context.user_agent_callback = agent
         renderer.set_document(dom, resource_path)
         renderer.layout
 
