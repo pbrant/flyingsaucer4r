@@ -70,7 +70,12 @@ class PDFFilter
     end
 
     def resource_path
-      path_to_url(File.join(RAILS_ROOT, 'public', 'placeholder.html'))
+      if Object.const_defined? "PUBLIC_ROOT"
+        puts Object.const_get("PUBLIC_ROOT")
+        path_to_url(File.join(PUBLIC_ROOT, 'placeholder.html'))
+      else
+        path_to_url(File.join(RAILS_ROOT, 'public', 'placeholder.html'))
+      end
     end
   end
 end

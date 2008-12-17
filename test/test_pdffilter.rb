@@ -48,6 +48,18 @@ class PDFFilterTest < Test::Unit::TestCase
     end
   end
 
+  context "A PDF request that uses PUBLIC_ROOT instead of RAILS_ROOT" do
+    setup do
+      standard_pdf("<html><body><h1><img src='images/apple.jpg' />Hello from Flying Saucer!</h1></body></html>")
+    end
+
+    should "render something" do
+      Object.const_set('PUBLIC_ROOT', RAILS_ROOT + '/public')
+      assert_not_nil PDFFilter.filter(@controller)
+      Object.send(:remove_const, 'PUBLIC_ROOT')
+    end
+  end
+
   def standard_pdf(content)
     @controller.request = stub(:parameters => { :format => "pdf" })
     response_mock = mock()
