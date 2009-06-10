@@ -1,4 +1,4 @@
-= flyingsaucer
+= flyingsaucer4r
 
 == DESCRIPTION:
 
@@ -10,7 +10,7 @@ XHTML to the browser.
 
 To add Flying Saucer to the JRuby classpath:
 
-    require 'flyingsaucer'
+    require 'flyingsaucer4r'
 
 To use within Rails:
 
@@ -31,7 +31,7 @@ Saucer on the way out to the browser.
 
 == INSTALL:
 
-    jruby -S gem install flyingsaucer
+    jruby -S gem install pbrant-flyingsaucer4r
 
 == LICENSE:
 
