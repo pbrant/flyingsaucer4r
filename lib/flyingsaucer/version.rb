@@ -1,3 +1,3 @@
 module FlyingSaucer
-  VERSION = '0.4.20081112'
+  VERSION = '0.5'
 end

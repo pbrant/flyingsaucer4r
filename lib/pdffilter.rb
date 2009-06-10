@@ -1,5 +1,6 @@
 require 'flyingsaucer'
 require 'java'
+require 'enumerator'
 
 class PDFFilter
   class UserAgent < org.xhtmlrenderer.pdf.ITextUserAgent
@@ -32,7 +33,16 @@ class PDFFilter
 
       controller.logger.debug("Rendering XHTML to PDF:\n" + controller.response.body) if debug?
 
-      dom = create_java_dom(controller.response.body) 
+      begin
+        dom = create_java_dom(controller.response.body) 
+      rescue NativeException => e
+        java_e = e.cause
+        if java_e.is_a?(org.xml.sax.SAXParseException)
+          context = provide_context(controller.response.body, java_e.line_number) 
+          controller.logger.info("Unable to parse XHTML at line #{java_e.line_number}, column #{java_e.column_number}: #{java_e.message}\n#{context}")
+        end
+        raise e
+      end
       estimated_pdf_length = controller.response.body.length
       output = java.io.ByteArrayOutputStream.new(estimated_pdf_length)
 
@@ -55,6 +65,30 @@ class PDFFilter
     end
 
     private
+    def provide_context(doc, line_no)
+      mark_selected = line_no != -1
+      line_no = 1 if line_no == -1
+      result = doc.enum_for(:each_line).enum_for(:each_with_index).inject([]) do |memo, pair|
+        line, current = pair
+        current += 1
+        diff = line_no - current
+        if diff.abs < 20 
+          format_string = if line_no == current && mark_selected
+                            "==> %4d %s"
+                          else
+                            "    %4d %s"
+                          end
+          memo << sprintf(format_string, current, line)
+        elsif current > line_no
+          break memo
+        end
+
+        memo
+      end
+
+      result.join('')
+    end
+
     def add_ie6_pdf_over_ssl_headers(headers)
       headers["Cache-Control"] ||= 'maxage=3600'
       headers["Pragma"] ||= 'public'

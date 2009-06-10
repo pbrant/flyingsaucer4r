@@ -17,6 +17,14 @@ class LoggerStub
   def last_debug_message
     @debug_message
   end
+
+  def info(message)
+    @info_message = message
+  end
+
+  def last_info_message
+    @info_message
+  end
 end
 
 class PDFFilterTest < Test::Unit::TestCase
@@ -70,6 +78,44 @@ class PDFFilterTest < Test::Unit::TestCase
     @headers = {}
     response_mock.expects(:headers).returns(@headers).once
     response_mock.expects(:body=).once
+  end
+
+  def invalid_xhtml(content)
+    @controller.request = stub(:parameters => { :format => "pdf" })
+    response_mock = mock()
+    @controller.response = response_mock
+    @controller.logger = LoggerStub.new
+    response_mock.expects(:body).returns(content).at_least_once
+  end
+
+  context "Malformed XHTML" do
+    should "report the line number of invalid XHTML with context" do
+      invalid_xhtml(<<-EOF)
+<html>
+  <body>
+    <h1>Hello from Flying Saucer!
+  </body>
+</html>
+      EOF
+      assert_raise NativeException do
+        PDFFilter.filter(@controller)
+      end
+      assert_match %r[Unable to parse XHTML at line 4], @controller.logger.last_info_message
+      assert_match %r[==>\s+4], @controller.logger.last_info_message
+    end
+
+    should "complain about XML that isn't" do
+      invalid_xhtml(<<-EOF)
+some text
+that
+really
+isn't XML
+      EOF
+      assert_raise NativeException do
+        PDFFilter.filter(@controller)
+      end
+      assert_match %r[==>\s+1 some text], @controller.logger.last_info_message
+    end
   end
 
   context "A PDF request" do
