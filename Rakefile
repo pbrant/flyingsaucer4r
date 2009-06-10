@@ -6,13 +6,13 @@ local_dir = File.dirname(__FILE__)
 lib_dir = "#{local_dir}/lib"
 $: << lib_dir unless $:.include?(lib_dir)
 
-require 'flyingsaucer/version.rb'
+require 'flyingsaucer4r/version.rb'
 
 DEPENDENT_JARS = [ 'itext-2_0_8_02.jar' ]
 
 STATIC_JAR_DIR = ENV['STATIC_JAR_DIR'] || "../StaticJars"
 
-Hoe.new('flyingsaucer', FlyingSaucer::VERSION) do |p|
+Hoe.new('flyingsaucer4r', FlyingSaucer4R::VERSION) do |p|
   p.developer('CCAP Web Team', 'CCAP_Web_Team@wicourts.gov')
 end
 
