@@ -1,3 +1,7 @@
+=== 0.6 / 2009-10-13
+
+* Pull out PDF creation from filter
+
 === 0.2.20081112 / 2008-12-05
 
 * Add debug setting to log the XHTML Flying Saucer sees

@@ -6,7 +6,7 @@ local_dir = File.dirname(__FILE__)
 lib_dir = "#{local_dir}/lib"
 $: << lib_dir unless $:.include?(lib_dir)
 
-require 'flyingsaucer4r/version.rb'
+require 'flyingsaucer4r'
 
 DEPENDENT_JARS = [ 'itext-2_0_8_02.jar' ]
 

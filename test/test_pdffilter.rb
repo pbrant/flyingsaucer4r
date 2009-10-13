@@ -7,7 +7,11 @@ lib_dir = "#{File.dirname(__FILE__)}/../lib"
 $: << lib_dir unless $:.include?(lib_dir)
 require 'pdffilter'
 
-RAILS_ROOT = File.dirname(__FILE__)
+class Rails
+  def self.public_path
+    File.dirname(__FILE__) + "/public"
+  end
+end
 
 class LoggerStub
   def debug(message)
@@ -53,18 +57,6 @@ class PDFFilterTest < Test::Unit::TestCase
 
     should "render something" do
       assert_not_nil PDFFilter.filter(@controller)
-    end
-  end
-
-  context "A PDF request that uses PUBLIC_ROOT instead of RAILS_ROOT" do
-    setup do
-      standard_pdf("<html><body><h1><img src='images/apple.jpg' />Hello from Flying Saucer!</h1></body></html>")
-    end
-
-    should "render something" do
-      Object.const_set('PUBLIC_ROOT', RAILS_ROOT + '/public')
-      assert_not_nil PDFFilter.filter(@controller)
-      Object.send(:remove_const, 'PUBLIC_ROOT')
     end
   end
 
@@ -153,15 +145,15 @@ isn't XML
       PDFFilter.debug = true
       begin
         PDFFilter.filter(@controller)
-        assert_match /<html>/, @controller.logger.last_debug_message
+        assert_match(/<html>/, @controller.logger.last_debug_message)
       ensure
         PDFFilter.debug = old_debug
       end
     end
   end
 
-  context PDFFilter::UserAgent do
-    setup { @user_agent = PDFFilter::UserAgent.new(org.xhtmlrenderer.pdf.ITextOutputDevice.new(1)) }
+  context FlyingSaucer4R::UserAgent do
+    setup { @user_agent = FlyingSaucer4R::UserAgent.new(org.xhtmlrenderer.pdf.ITextOutputDevice.new(1)) }
 
     should "treat absolute URIs as relative (Java method name)" do
       assert_equal @user_agent.resolveURI('stylesheets/aim.css'), @user_agent.resolveURI('/stylesheets/aim.css')
