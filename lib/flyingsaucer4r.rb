@@ -4,7 +4,7 @@ require 'enumerator'
 Dir.glob(File.join(File.dirname(__FILE__), "*.jar")) { |jar| require File.basename(jar) }
 
 module FlyingSaucer4R
-  VERSION = '0.6'
+  VERSION = '0.6.1'
 
   class UserAgent < org.xhtmlrenderer.pdf.ITextUserAgent
     def initialize(output_device)
@@ -41,7 +41,7 @@ module FlyingSaucer4R
       line, current = pair
       current += 1
       diff = line_no - current
-      if diff.abs < 20 
+      if diff.abs < 20
         format_string = if line_no == current && mark_selected
                           "==> %4d %s"
                         else
@@ -65,7 +65,7 @@ module FlyingSaucer4R
     rescue NativeException => e
       java_e = e.cause
       if java_e.is_a?(org.xml.sax.SAXParseException)
-        context = provide_context(s, java_e.line_number) 
+        context = provide_context(s, java_e.line_number)
         logger.info("Unable to parse XHTML at line #{java_e.line_number}, column #{java_e.column_number}: #{java_e.message}\n#{context}") if logger
       end
       raise e
