@@ -4,7 +4,7 @@ require 'enumerator'
 Dir.glob(File.join(File.dirname(__FILE__), "*.jar")) { |jar| require File.basename(jar) }
 
 module FlyingSaucer4R
-  VERSION = '0.6.1'
+  VERSION = '0.7'
 
   class UserAgent < org.xhtmlrenderer.pdf.ITextUserAgent
     def initialize(output_device)
