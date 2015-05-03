@@ -2,9 +2,9 @@ History.txt
 Manifest.txt
 README.txt
 Rakefile
+lib/flying-saucer-core-9.0.2.jar
+lib/flying-saucer-pdf-9.0.2.jar
 lib/flyingsaucer4r.rb
-lib/flyingsaucer4r/version.rb
-lib/itext-2_0_8_02.jar
+lib/itext-2.1.7.02.jar
 lib/pdffilter.rb
-lib/xhtmlrenderer20081112-core-renderer.jar
 test/test_pdffilter.rb
