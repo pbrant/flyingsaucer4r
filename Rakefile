@@ -6,7 +6,7 @@ DEPENDENT_JARS = [ 'itext-2_0_8_02.jar' ]
 
 STATIC_JAR_DIR = ENV['STATIC_JAR_DIR'] || "../StaticJars"
 
-Hoe.spec('pbrant-flyingsaucer4r') do |p|
+Hoe.spec('flyingsaucer4r') do |p|
   developer 'CCAP Web Team', 'CCAP_Web_Team@wicourts.gov'
 end
 
